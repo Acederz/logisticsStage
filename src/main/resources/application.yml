@@ -1,0 +1,29 @@
+logging:
+  config: classpath:logback.xml
+  level:
+    com.top.logisticsStage: trace
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@192.168.80.16:1521:topprod
+    #username: DEV_BD
+    #password: TOP_DEV
+    username: edi
+    password: edi
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle10gDialect
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mvc:
+    date-format: yyyy-MM-dd
+  thymeleaf:
+    cache: true
+  resources:
+    static-locations: classpath:/static/,classpath:/templates
+
