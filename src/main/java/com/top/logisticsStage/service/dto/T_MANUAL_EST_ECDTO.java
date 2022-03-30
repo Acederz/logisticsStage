@@ -1,43 +1,38 @@
-package com.top.logisticsStage.domain;
+package com.top.logisticsStage.service.dto;
 
 import com.top.logisticsStage.domain.enumeration.TargetType;
-import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.*;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-@ApiModel(description = "目标导入")
-@Entity
-@Table( name = "T_MANUAL_EST_EC" )
-public class T_MANUAL_EST_EC implements Serializable {
+public class T_MANUAL_EST_ECDTO implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column( name = "ID" )
+    @ApiModelProperty( value = "ID" )
     private Long id;
 
-    @Column( name = "料号" )
+    @ApiModelProperty( value = "料号" )
     private String itemCode;
 
-    @Column( name = "年", precision = 4, scale = 0)
+    @ApiModelProperty( value = "年")
     private BigDecimal year;
 
-    @Column( name = "月", precision = 2, scale = 0)
+    @ApiModelProperty( value = "月")
     private BigDecimal month;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "目标类型")
+    @ApiModelProperty(value = "目标类型")
     private TargetType targetType;
 
-    @Column( name = "目标零支销售量", precision = 10, scale = 2)
+    @ApiModelProperty( value = "目标零支销售量")
     private BigDecimal saleNumber;
 
-    @Column( name = "目标零支销售单价", precision = 10, scale = 2)
+    @ApiModelProperty( value = "目标零支销售单价")
     private BigDecimal salePrice;
 
-    @Column( name = "目标财务毛利额", precision = 10, scale = 2)
+    @ApiModelProperty( value = "目标财务毛利额")
     private BigDecimal saleAmount;
 
     public Long getId() {
@@ -106,7 +101,7 @@ public class T_MANUAL_EST_EC implements Serializable {
 
     @Override
     public String toString() {
-        return "T_MANUAL_EST_EC{" +
+        return "T_MANUAL_EST_ECDTO{" +
                 "id=" + id +
                 ", itemCode='" + itemCode + '\'' +
                 ", year=" + year +
