@@ -98,7 +98,6 @@ public class T_MANUAL_EST_ECExcelService {
                         case "targetType":
                         case "saleNumber":
                         case "salePrice":
-                        case "saleAmount":
                             cellIsNotNull(key, headMap.get(key), value, entity, result);
                             break;
                         default: entity.put(key, value); break;
@@ -128,6 +127,13 @@ public class T_MANUAL_EST_ECExcelService {
     public void tmpToEntity(List<T_MANUAL_EST_EC> list) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
+            list.forEach(e->{
+                T_MANUAL_EST_EC t = t_MANUAL_EST_ECRepository.findAllByItemCodeAndYearAndMonthAndTargetType(e.getItemCode(),e.getYear(),e.getMonth(),e.getTargetType());
+                if(t!=null) {
+                    log.info("T_MANUAL_EST_EC导入旧数据："+t.toString()+"新数据："+e.toString());
+                    e.setId(t.getId());
+                }
+            });
             t_MANUAL_EST_ECRepository.saveAll(list);
         } catch (Exception e) {
             throw new RuntimeException("插入数据库报错。");
@@ -325,7 +331,7 @@ public class T_MANUAL_EST_ECExcelService {
         map.put("year", "年");
         map.put("month", "月");
         map.put("targetType", "目标类型");
-        map.put("saleNumber", "目标零支销售量");
+        map.put("saleNumber", "目标零支销量");
         map.put("salePrice", "目标零支销售单价");
         map.put("saleAmount", "目标财务毛利额");
         return map;

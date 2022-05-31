@@ -5,8 +5,8 @@ package com.top.logisticsStage.domain.enumeration;
  * 目标类型
  */
 public enum TargetType {
-    M("月"),
-    Y("年");
+    M("M"),
+    Y("Y");
 
     private final String description;
 

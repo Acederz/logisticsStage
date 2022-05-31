@@ -31,7 +31,7 @@ public class T_MANUAL_EST_EC implements Serializable {
     @Column(name = "目标类型")
     private TargetType targetType;
 
-    @Column( name = "目标零支销售量", precision = 10, scale = 2)
+    @Column( name = "目标零支销量", precision = 10, scale = 2)
     private BigDecimal saleNumber;
 
     @Column( name = "目标零支销售单价", precision = 10, scale = 2)

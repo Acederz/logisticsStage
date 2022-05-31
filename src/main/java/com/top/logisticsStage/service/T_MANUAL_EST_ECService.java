@@ -42,7 +42,7 @@ public class T_MANUAL_EST_ECService {
     public T_MANUAL_EST_ECDTO create(T_MANUAL_EST_ECDTO dto) {
         log.info(SecurityUtils.getCurrentUserLogin() +"新增："+dto.toString());
         T_MANUAL_EST_EC entity = t_MANUAL_EST_ECMapper.toEntity(dto);
-        if(t_MANUAL_EST_ECRepository.existsAllByItemCodeAndYearAndMonth(entity.getItemCode(), entity.getYear(), entity.getMonth())) {
+        if(t_MANUAL_EST_ECRepository.existsAllByItemCodeAndYearAndMonthAndTargetType(entity.getItemCode(), entity.getYear(), entity.getMonth(), entity.getTargetType())) {
             throw new ServiceException("数据已存在！");
         }
         entity = t_MANUAL_EST_ECRepository.save(entity);

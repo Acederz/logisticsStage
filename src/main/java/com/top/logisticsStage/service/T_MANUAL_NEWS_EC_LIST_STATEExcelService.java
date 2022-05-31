@@ -94,7 +94,6 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
                     switch (key) {
                         case "itemName":
                         case "itemCode":
-                        case "oldItemCode":
                             cellIsNotNull(key, headMap.get(key), value, entity, result);
                             break;
                         default: entity.put(key, value); break;
@@ -142,6 +141,10 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
                     log.info("修改数据"+e.toString());
                     T_MANUAL_NEWS_EC_LIST_STATE z = t_MANUAL_NEWS_EC_LIST_STATERepository.findById(e.itemCode).get();
                     t.setOnTrace(z.getOnTrace());
+                } else if(StringUtils.isNotBlank(e.getItemCode())
+                        &&StringUtils.isBlank(e.getOldItemCode())) {
+                    log.info("新增数据"+e.toString());
+                    t.setOnTrace("是");
                 }
                 list_states.add(t);
             });
