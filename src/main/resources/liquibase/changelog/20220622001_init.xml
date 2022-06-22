@@ -1,0 +1,13 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet id="20220622001-1" author="acederz">
+        <sql dbms="oracle"
+             endDelimiter=";"
+             splitStatements="true"
+             stripComments="true">
+            INSERT INTO "T_AUTHORITY" VALUES ('2', 'WL', '物流部门', '/index', null);
+            INSERT INTO "T_AUTHORITY" VALUES ('3', 'T_WL_ITEMSIZE', '物流品项尺寸', '/T_WL_ITEMSIZE', '2');
+            INSERT INTO "T_AUTHORITY" VALUES ('1', 'admin', '管理页', '/index', null);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
