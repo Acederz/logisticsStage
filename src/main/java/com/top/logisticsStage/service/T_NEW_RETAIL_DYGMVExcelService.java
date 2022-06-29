@@ -1,13 +1,16 @@
 package com.top.logisticsStage.service;
 
-import com.top.logisticsStage.domain.T_JN_POS;
-import com.top.logisticsStage.repository.T_JN_POSRepository;
+import com.top.logisticsStage.domain.T_NEW_RETAIL_DYGMV;
+import com.top.logisticsStage.domain.enumeration.TargetType;
+import com.top.logisticsStage.repository.T_NEW_RETAIL_DYGMVRepository;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,14 +31,15 @@ import java.util.*;
 
 @Service
 @Transactional
-public class T_JN_POSExcelService {
+public class T_NEW_RETAIL_DYGMVExcelService {
 
+    private final Logger log = LoggerFactory.getLogger(T_NEW_RETAIL_DYGMVExcelService.class);
 
-    private final String EXCELL_NAME = "classpath:templates/T_JN_POS.xlsx";
-    private final T_JN_POSRepository t_JN_POSRepository;
+    private final String EXCELL_NAME = "classpath:templates/T_NEW_RETAIL_DYGMV.xlsx";
+    private final T_NEW_RETAIL_DYGMVRepository t_NEW_RETAIL_DYGMVRepository;
 
-    public T_JN_POSExcelService(T_JN_POSRepository t_JN_POSRepository) {
-        this.t_JN_POSRepository = t_JN_POSRepository;
+    public T_NEW_RETAIL_DYGMVExcelService(T_NEW_RETAIL_DYGMVRepository t_NEW_RETAIL_DYGMVRepository) {
+        this.t_NEW_RETAIL_DYGMVRepository = t_NEW_RETAIL_DYGMVRepository;
     }
 
     // 样式
@@ -54,7 +59,7 @@ public class T_JN_POSExcelService {
         return book;
     }
 
-    public void excelImport(Workbook workbook){
+    public void excelImport(Workbook workbook, String fileName){
         Sheet sheet = workbook.getSheetAt(0);
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
@@ -66,10 +71,10 @@ public class T_JN_POSExcelService {
 
             Map<String, String> headMap = getHeadMap();
             //Map<String, Object> selectMap = getSelectMap();
-            Map<String, String> telephoneAndName = new HashMap<>();
-            Map<String, String> jobNumber = new HashMap<>();
+            //Map<String, String> telephoneAndName = new HashMap<>();
+            //Map<String, String> jobNumber = new HashMap<>();
             int errorCount = 0;
-            List<T_JN_POS> list = new ArrayList<>();
+            List<T_NEW_RETAIL_DYGMV> list = new ArrayList<>();
             for (int i = 1; i < totalRows; i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) {
@@ -87,24 +92,19 @@ public class T_JN_POSExcelService {
                     String value = getCellValue(row.getCell(index), format);
                     value = StringUtils.isBlank(value)?null:value;
                     switch (key) {
-                        case "year":
-                        case "month":
-                        case "sysName":
-                        case "sysCode":
-                        case "storeName":
-                        case "itemCode":
-                        case "saleQuantity":
-                        case "saleAmount":
-                            cellIsNotNull(key, headMap.get(key), value, entity, result);
+                        case "date":
+                            if(cellIsNotNull(key, headMap.get(key), value, entity, result)) {
+                                toDate(key, headMap.get(key), value, entity, dateTimeFormatter, result);
+                            }
                             break;
-                        case "saleDate":
-                            toDate(key, headMap.get(key), value, entity, dateTimeFormatter, result);
+                        case "accountName":
+                            cellIsNotNull(key, headMap.get(key), value, entity, result);
                             break;
                         default: entity.put(key, value); break;
                     }
                     index++;
                 }
-                T_JN_POS t = mapToBean(entity);
+                T_NEW_RETAIL_DYGMV t = mapToBean(entity,fileName);
                 list.add(t);
                 //错误信息记录
                 //String s = JSONObject.fromObject(result).toString()
@@ -124,10 +124,17 @@ public class T_JN_POSExcelService {
         }
     }
 
-    public void tmpToEntity(List<T_JN_POS> list) {
+    public void tmpToEntity(List<T_NEW_RETAIL_DYGMV> list) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
-            t_JN_POSRepository.saveAll(list);
+            list.forEach(e->{
+                T_NEW_RETAIL_DYGMV t = t_NEW_RETAIL_DYGMVRepository.findFirstByDateAndAccountName(e.getDate(),e.getAccountName());
+                if(t!=null) {
+                    log.info("T_NEW_RETAIL_DYGMV导入旧数据："+t.toString()+"新数据："+e.toString());
+                    e.setId(t.getId());
+                }
+            });
+            t_NEW_RETAIL_DYGMVRepository.saveAll(list);
         } catch (Exception e) {
             throw new RuntimeException("插入数据库报错。");
         }
@@ -164,7 +171,7 @@ public class T_JN_POSExcelService {
             Row headRow = sheet.getRow(0);
             Map<String, String> headMap = getHeadMap();
             setDataCellStyles(workbook, sheet);
-            List<T_JN_POS> list = t_JN_POSRepository.findAll();
+            List<T_NEW_RETAIL_DYGMV> list = t_NEW_RETAIL_DYGMVRepository.findAll();
             // 创建绘图对象
             Drawing p = sheet.createDrawingPatriarch();
             for (int i = 0; i < list.size(); i++) {
@@ -214,20 +221,20 @@ public class T_JN_POSExcelService {
         return bean;
     }
 
-    public T_JN_POS mapToBean(Map<String, Object> map) throws Exception {
-        T_JN_POS bean = new T_JN_POS();
-        bean.setYear(map.get("year")==null?null:new BigDecimal(map.get("year").toString()));
-        bean.setMonth(map.get("month")==null?null:new BigDecimal(map.get("month").toString()));
-        bean.setSysName(map.get("sysName")==null?null:map.get("sysName").toString());
-        bean.setSysCode(map.get("sysCode")==null?null:map.get("sysCode").toString());
-        bean.setStoreName(map.get("storeName")==null?null:map.get("storeName").toString());
-        bean.setItemCode(map.get("itemCode")==null?null:map.get("itemCode").toString());
-        bean.setItemName(map.get("itemName")==null?null:map.get("itemName").toString());
-        bean.setBarCode(map.get("barCode")==null?null:map.get("barCode").toString());
-        bean.setSaleQuantity(map.get("saleQuantity")==null?null:new BigDecimal(map.get("saleQuantity").toString()));
-        bean.setSaleAmount(map.get("saleAmount")==null?null:new BigDecimal(map.get("saleAmount").toString()));
-        bean.setSaleDate(map.get("saleDate")==null?null:MapValueToDate(map.get("saleDate").toString()));
-        bean.setUpdateTime(LocalDateTime.now());
+    public T_NEW_RETAIL_DYGMV mapToBean(Map<String, Object> map, String fileName) throws Exception {
+        T_NEW_RETAIL_DYGMV bean = new T_NEW_RETAIL_DYGMV();
+        bean.setDate(map.get("date")==null?null:MapValueToDate(map.get("date").toString()));
+        bean.setAccountName(map.get("accountName")==null?null:map.get("accountName").toString());
+        bean.setAccountType(map.get("accountType")==null?null:map.get("accountType").toString());
+        bean.setCoopMode(map.get("coopMode")==null?null:map.get("coopMode").toString());
+        bean.setGmv(map.get("gmv")==null?null:new BigDecimal(map.get("gmv").toString()).setScale(2, RoundingMode.HALF_UP));
+        bean.setPeopleNumber(map.get("peopleNumber")==null?null:new BigDecimal(map.get("peopleNumber").toString()).setScale(0, RoundingMode.UP));
+        bean.setUnitPrice(map.get("unitPrice")==null?null:new BigDecimal(map.get("unitPrice").toString()).setScale(2, RoundingMode.HALF_UP));
+        bean.setClickTransactionRate(map.get("clickTransactionRate")==null?null:new BigDecimal(map.get("clickTransactionRate").toString()).setScale(2, RoundingMode.HALF_UP));
+        bean.setLiveAmount(map.get("liveAmount")==null?null:new BigDecimal(map.get("liveAmount").toString()).setScale(2, RoundingMode.HALF_UP));
+        bean.setShortVideoAmount(map.get("shortVideoAmount")==null?null:new BigDecimal(map.get("shortVideoAmount").toString()).setScale(2, RoundingMode.HALF_UP));
+        bean.setCardAmount(map.get("cardAmount")==null?null:new BigDecimal(map.get("cardAmount").toString()).setScale(2, RoundingMode.HALF_UP));
+        bean.setStoreName(fileName==null?null:fileName);
         return bean;
     }
 
@@ -270,6 +277,7 @@ public class T_JN_POSExcelService {
     private boolean cellIsNotNull(String key, String cellName, String cellValue, Map<String, Object> user, Map<String, String> result){
         user.put(key, cellValue);
         if (StringUtils.isBlank(cellValue)) {
+            log.info(key+"  "+cellName + "的值不能为空！");
             result.put(key, cellName + "的值不能为空！");
             return false;
         }
@@ -279,6 +287,7 @@ public class T_JN_POSExcelService {
     private boolean cellIsToSelect(String key, String cellName, String cellValue, Map<String, Object> select, Map<String, Object> user, Map<String, String> result) {
         user.put(key, cellValue);
         if (!select.containsKey(cellValue)) {
+            log.info(key+"  "+cellName + "的值不符合下拉列表！");
             result.put(key, cellName + "的值不符合下拉列表！");
             return true;
         }
@@ -291,6 +300,7 @@ public class T_JN_POSExcelService {
             try {
                 LocalDate date = LocalDate.parse(cellValue, dateTimeFormatter);
             } catch (Exception e) {
+                log.info(key+"  "+cellName + "不是规范日期格式，请格式化日期(yyyy-mm-dd)！");
                 result.put(key, cellName + "不是规范日期格式，请格式化日期(yyyy-mm-dd)！");
             }
 
@@ -322,17 +332,17 @@ public class T_JN_POSExcelService {
 
     public Map<String, String> getHeadMap(){
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("year", "年");
-        map.put("month", "月");
-        map.put("sysName", "系统名称");
-        map.put("sysCode", "系统门店编号");
-        map.put("storeName", "门店名称");
-        map.put("itemCode", "商品编号");
-        map.put("itemName", "商品名称");
-        map.put("barCode", "条码");
-        map.put("saleQuantity", "销售数量");
-        map.put("saleAmount", "销售金额(含税)");
-        map.put("saleDate", "销售日期");
+        map.put("date", "日期");
+        map.put("accountName", "帐号名称");
+        map.put("accountType", "帐号类型");
+        map.put("coopMode", "合作模式");
+        map.put("gmv", "成交金额");
+        map.put("peopleNumber", "成交人数");
+        map.put("unitPrice", "成交客单价");
+        map.put("clickTransactionRate", "商品点击-成交率");
+        map.put("liveAmount", "直播成交金额");
+        map.put("shortVideoAmount", "短视频成交金额");
+        map.put("cardAmount", "商品卡成交金额");
         return map;
     }
 
@@ -430,5 +440,4 @@ public class T_JN_POSExcelService {
         }
         return null;
     }
-
 }

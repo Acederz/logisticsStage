@@ -185,13 +185,13 @@ public class T_WL_ITEMSIZEExcelService {
                     cell.setCellValue(jsonObject.getString(key));
 //                    if (result.containsKey(key)){
 //                        cell.setCellStyle(cellStyle);
-//                        Comment comment = p.createCellComment(new XSSFClientAnchor(i+1, i+1, cellIndex, cellIndex, (short) 3, 3, (short) 5, 6));
+//                        CoMMent coMMent = p.createCellCoMMent(new XSSFClientAnchor(i+1, i+1, cellIndex, cellIndex, (short) 3, 3, (short) 5, 6));
 //                        // 输入批注信息
-//                        comment.setString(new XSSFRichTextString(result.get(key).toString()));
+//                        coMMent.setString(new XSSFRichTextString(result.get(key).toString()));
 //                        // 添加作者,选中B5单元格,看状态栏
-//                        comment.setAuthor("toad");
+//                        coMMent.setAuthor("toad");
 //                        // 将批注添加到单元格对象中
-//                        cell.setCellComment(comment);
+//                        cell.setCellCoMMent(coMMent);
 //                        resultStr.append(result.get(key) + "；");
 //                    }
                     cellIndex++;
@@ -247,7 +247,7 @@ public class T_WL_ITEMSIZEExcelService {
                 return LocalDate.parse(s, dateTimeFormatter);
             }catch (Exception e) {
                 try {
-                    return LocalDate.parse(s, DateTimeFormatter.ofPattern("yyyy/mm/dd"));
+                    return LocalDate.parse(s, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
                 } catch (Exception ee) {
                     throw new RuntimeException("日期转换错误");
                 }
@@ -300,7 +300,7 @@ public class T_WL_ITEMSIZEExcelService {
             try {
                 LocalDate date = LocalDate.parse(cellValue, dateTimeFormatter);
             } catch (Exception e) {
-                result.put(key, cellName + "不是规范日期格式，请格式化日期(yyyy-mm-dd)！");
+                result.put(key, cellName + "不是规范日期格式，请格式化日期(yyyy-MM-dd)！");
             }
 
         } else {

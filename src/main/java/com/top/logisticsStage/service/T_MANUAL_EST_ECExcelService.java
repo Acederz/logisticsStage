@@ -61,8 +61,8 @@ public class T_MANUAL_EST_ECExcelService {
 
     public void excelImport(Workbook workbook){
         Sheet sheet = workbook.getSheetAt(0);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy/mm/dd");
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/mm/dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         try {
             int totalRows = sheet.getPhysicalNumberOfRows();
             if (totalRows < 1) {
@@ -234,7 +234,7 @@ public class T_MANUAL_EST_ECExcelService {
     }
 
     private LocalDate MapValueToDate(String s){
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/mm/dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         if (StringUtils.isNotBlank(s)) {
             try {
                 return LocalDate.parse(s, dateTimeFormatter);
@@ -295,8 +295,8 @@ public class T_MANUAL_EST_ECExcelService {
             try {
                 LocalDate date = LocalDate.parse(cellValue, dateTimeFormatter);
             } catch (Exception e) {
-                log.info(key+"  "+cellName + "不是规范日期格式，请格式化日期(yyyy-mm-dd)！");
-                result.put(key, cellName + "不是规范日期格式，请格式化日期(yyyy-mm-dd)！");
+                log.info(key+"  "+cellName + "不是规范日期格式，请格式化日期(yyyy-MM-dd)！");
+                result.put(key, cellName + "不是规范日期格式，请格式化日期(yyyy-MM-dd)！");
             }
 
         } else {
