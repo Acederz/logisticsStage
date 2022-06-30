@@ -4,14 +4,17 @@ logging:
     com.top.logisticsStage: trace
 server:
   port: 8080
+  servlet:
+    session:
+      timeout: 60
 spring:
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
     url: jdbc:oracle:thin:@192.168.80.16:1521:topprod
-    username: DEV_BD
-    password: TOP_DEV
-    #username: edi
-    #password: edi
+    #username: DEV_BD
+    #password: TOP_DEV
+    username: edi
+    password: edi
   liquibase:
     change-log: classpath:/liquibase/master.xml
   jpa:
@@ -28,4 +31,6 @@ spring:
     cache: true
   resources:
     static-locations: classpath:/static/,classpath:/templates
+  profiles:
+    active: @profileActive@
 
