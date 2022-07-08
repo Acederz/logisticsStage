@@ -55,8 +55,7 @@ public class T_NEW_RETAIL_DYGMVResource {
         //UserExcelTask userExcelTask = null;
         //String tenantKey = TenantContext.get();
         String fileName = file.getOriginalFilename();
-        String name = StringUtils.isNotBlank(fileName)?fileName.split("-|\\.")[0]:null;
-        if(name==null) {
+        if(fileName==null) {
             return new ResponseEntity(new ErrorVM("文件名不为空"), HttpStatus.BAD_REQUEST);
         }
         try {
@@ -67,7 +66,7 @@ public class T_NEW_RETAIL_DYGMVResource {
         }
         //TenantContext.set(tenantKey);
         try {
-            t_NEW_RETAIL_DYGMVExcelService.excelImport(workbook,name);
+            t_NEW_RETAIL_DYGMVExcelService.excelImport(workbook,fileName);
         } catch (Exception e) {
             return new ResponseEntity(new ErrorVM(e.getMessage()), HttpStatus.BAD_REQUEST);
         }

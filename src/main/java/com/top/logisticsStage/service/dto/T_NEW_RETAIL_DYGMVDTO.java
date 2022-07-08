@@ -54,6 +54,9 @@ public class T_NEW_RETAIL_DYGMVDTO implements Serializable {
     @ApiModelProperty( name = "DY003" )
     private String dy003;
 
+    @ApiModelProperty( name = "文件名" )
+    private String filename;
+
     public Long getId() {
         return id;
     }
@@ -182,6 +185,14 @@ public class T_NEW_RETAIL_DYGMVDTO implements Serializable {
         this.storeName = storeName;
     }
 
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
     @Override
     public String toString() {
         return "T_NEW_RETAIL_DYGMVDTO{" +
@@ -201,6 +212,7 @@ public class T_NEW_RETAIL_DYGMVDTO implements Serializable {
                 ", dy001='" + dy001 + '\'' +
                 ", dy002='" + dy002 + '\'' +
                 ", dy003='" + dy003 + '\'' +
+                ", filename='" + filename + '\'' +
                 '}';
     }
 }

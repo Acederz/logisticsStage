@@ -23,8 +23,7 @@ public class UserAndAuthority implements Serializable {
      * 权限
      */
     @ApiModelProperty(value = "权限")
-    @OneToOne
-    @JoinColumn(name = "AUTHORITY_ID", unique = true)
+    @ManyToOne
     private Authority authority;
 
     public Long getId() {

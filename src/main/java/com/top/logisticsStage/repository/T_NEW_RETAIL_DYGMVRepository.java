@@ -8,5 +8,7 @@ import java.time.LocalDate;
 
 public interface T_NEW_RETAIL_DYGMVRepository extends JpaRepository<T_NEW_RETAIL_DYGMV, Long >, JpaSpecificationExecutor<T_NEW_RETAIL_DYGMV> {
 
-    T_NEW_RETAIL_DYGMV findFirstByDateAndAccountName(LocalDate date, String accountName);
+    T_NEW_RETAIL_DYGMV findFirstByDateAndAccountNameAndAccountTypeAndCoopMode(LocalDate date, String accountName,String accountType,String coopMode);
+
+    Boolean existsAllByFilename(String filename);
 }

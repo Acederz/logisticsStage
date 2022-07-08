@@ -6,6 +6,7 @@ import com.top.logisticsStage.repository.T_NEW_RETAIL_DYGMVRepository;
 import com.top.logisticsStage.service.dto.T_NEW_RETAIL_DYGMVDTO;
 import com.top.logisticsStage.service.mapper.T_NEW_RETAIL_DYGMVMapper;
 import com.top.logisticsStage.web.rest.vm.T_NEW_RETAIL_DYGMVQueryVM;
+import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
@@ -42,6 +43,9 @@ public class T_NEW_RETAIL_DYGMVService {
     public Page<T_NEW_RETAIL_DYGMVDTO> findList(T_NEW_RETAIL_DYGMVQueryVM queryVM, Pageable pageable) {
         Page<T_NEW_RETAIL_DYGMV> list = t_NEW_RETAIL_DYGMVRepository.findAll(buildMultConditional(queryVM), pageable);
         Page<T_NEW_RETAIL_DYGMVDTO> page = list.map(t_NEW_RETAIL_DYGMVMapper::toDto);
+        page.getContent().forEach(e->{
+            e.setAccountName(EmojiParser.parseToUnicode(e.getAccountName()));
+        });
         return page;
     }
 

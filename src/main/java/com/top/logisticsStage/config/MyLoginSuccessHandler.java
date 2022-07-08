@@ -33,9 +33,11 @@ public class MyLoginSuccessHandler implements AuthenticationSuccessHandler {
         PrintWriter printWriter = response.getWriter();
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("text/html;charset=utf-8");
+        String token = TokenUtil.sign(userDetails.getUsername());
         Map<String, String> msgMap = new HashMap<>();
-        msgMap.put("result", "0");
-        msgMap.put("token", userDetails.getUsername());
+        msgMap.put("code", "200");
+        msgMap.put("token", token);
+        msgMap.put("account", userDetails.getUsername());
         msgMap.put("msg", "登录成功");
         printWriter.write(new Gson().toJson(msgMap));
         printWriter.flush();

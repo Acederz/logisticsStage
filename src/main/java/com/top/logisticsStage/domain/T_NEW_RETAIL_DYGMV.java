@@ -17,7 +17,7 @@ import java.util.Objects;
 public class T_NEW_RETAIL_DYGMV implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column( name = "ID" )
     private Long id;
 
@@ -65,6 +65,9 @@ public class T_NEW_RETAIL_DYGMV implements Serializable {
 
     @Column( name = "DY003" )
     private String dy003;
+
+    @Column( name = "文件名" )
+    private String filename;
 
     public Long getId() {
         return id;
@@ -194,6 +197,14 @@ public class T_NEW_RETAIL_DYGMV implements Serializable {
         this.storeName = storeName;
     }
 
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
     @Override
     public String toString() {
         return "T_NEW_RETAIL_DYGMV{" +
@@ -213,6 +224,7 @@ public class T_NEW_RETAIL_DYGMV implements Serializable {
                 ", dy001='" + dy001 + '\'' +
                 ", dy002='" + dy002 + '\'' +
                 ", dy003='" + dy003 + '\'' +
+                ", filename='" + filename + '\'' +
                 '}';
     }
 }

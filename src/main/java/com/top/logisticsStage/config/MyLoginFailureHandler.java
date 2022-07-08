@@ -17,9 +17,11 @@ public class MyLoginFailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         System.out.println("===========登陆失败================");
         PrintWriter printWriter = httpServletResponse.getWriter();
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.setContentType("text/html;charset=utf-8");
         Map<String, String> msgMap = new HashMap<>();
-        msgMap.put("result", "1");
-        msgMap.put("msg", "登录失败");
+        msgMap.put("code", "500");
+        msgMap.put("msg", "账号或密码错误");
         printWriter.write(new Gson().toJson(msgMap));
         printWriter.flush();
         printWriter.close();

@@ -3,6 +3,7 @@ package com.top.logisticsStage.service;
 import com.top.logisticsStage.domain.T_NEW_RETAIL_DYGMV;
 import com.top.logisticsStage.domain.enumeration.TargetType;
 import com.top.logisticsStage.repository.T_NEW_RETAIL_DYGMVRepository;
+import com.vdurmont.emoji.EmojiParser;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -46,6 +47,9 @@ public class T_NEW_RETAIL_DYGMVExcelService {
     private CellStyle cellStyle;
 
     public Workbook checkFile(MultipartFile excelFile) {
+        if(t_NEW_RETAIL_DYGMVRepository.existsAllByFilename(excelFile.getOriginalFilename())) {
+            throw new RuntimeException("上传失败，文件已上传过！（存在重复文件名记录）");
+        }
         if (excelFile.getSize() == 0) {
             throw new RuntimeException("文件错误,文件不能为空!");
         }
@@ -60,6 +64,7 @@ public class T_NEW_RETAIL_DYGMVExcelService {
     }
 
     public void excelImport(Workbook workbook, String fileName){
+        String fname = StringUtils.isNotBlank(fileName)?fileName.split("-|\\.")[0]:null;
         Sheet sheet = workbook.getSheetAt(0);
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
@@ -104,7 +109,7 @@ public class T_NEW_RETAIL_DYGMVExcelService {
                     }
                     index++;
                 }
-                T_NEW_RETAIL_DYGMV t = mapToBean(entity,fileName);
+                T_NEW_RETAIL_DYGMV t = mapToBean(entity,fname,fileName);
                 list.add(t);
                 //错误信息记录
                 //String s = JSONObject.fromObject(result).toString()
@@ -128,7 +133,7 @@ public class T_NEW_RETAIL_DYGMVExcelService {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
             list.forEach(e->{
-                T_NEW_RETAIL_DYGMV t = t_NEW_RETAIL_DYGMVRepository.findFirstByDateAndAccountName(e.getDate(),e.getAccountName());
+                T_NEW_RETAIL_DYGMV t = t_NEW_RETAIL_DYGMVRepository.findFirstByDateAndAccountNameAndAccountTypeAndCoopMode(e.getDate(),e.getAccountName(),e.getAccountType(),e.getCoopMode());
                 if(t!=null) {
                     log.info("T_NEW_RETAIL_DYGMV导入旧数据："+t.toString()+"新数据："+e.toString());
                     e.setId(t.getId());
@@ -221,10 +226,10 @@ public class T_NEW_RETAIL_DYGMVExcelService {
         return bean;
     }
 
-    public T_NEW_RETAIL_DYGMV mapToBean(Map<String, Object> map, String fileName) throws Exception {
+    public T_NEW_RETAIL_DYGMV mapToBean(Map<String, Object> map,String fname, String fileName) throws Exception {
         T_NEW_RETAIL_DYGMV bean = new T_NEW_RETAIL_DYGMV();
         bean.setDate(map.get("date")==null?null:MapValueToDate(map.get("date").toString()));
-        bean.setAccountName(map.get("accountName")==null?null:map.get("accountName").toString());
+        bean.setAccountName(map.get("accountName")==null?null: EmojiParser.parseToHtmlHexadecimal(map.get("accountName").toString()));
         bean.setAccountType(map.get("accountType")==null?null:map.get("accountType").toString());
         bean.setCoopMode(map.get("coopMode")==null?null:map.get("coopMode").toString());
         bean.setGmv(map.get("gmv")==null?null:new BigDecimal(map.get("gmv").toString()).setScale(2, RoundingMode.HALF_UP));
@@ -234,7 +239,8 @@ public class T_NEW_RETAIL_DYGMVExcelService {
         bean.setLiveAmount(map.get("liveAmount")==null?null:new BigDecimal(map.get("liveAmount").toString()).setScale(2, RoundingMode.HALF_UP));
         bean.setShortVideoAmount(map.get("shortVideoAmount")==null?null:new BigDecimal(map.get("shortVideoAmount").toString()).setScale(2, RoundingMode.HALF_UP));
         bean.setCardAmount(map.get("cardAmount")==null?null:new BigDecimal(map.get("cardAmount").toString()).setScale(2, RoundingMode.HALF_UP));
-        bean.setStoreName(fileName==null?null:fileName);
+        bean.setStoreName(fname==null?null:fname);
+        bean.setFilename(fileName==null?null:fileName);
         return bean;
     }
 
