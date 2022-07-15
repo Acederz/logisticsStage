@@ -2,6 +2,7 @@ package com.top.logisticsStage.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 
 public class T_MANUAL_NEWS_EC_LIST_STATEDTO implements Serializable {
@@ -14,6 +15,15 @@ public class T_MANUAL_NEWS_EC_LIST_STATEDTO implements Serializable {
 
     @ApiModelProperty( value ="是否追踪" )
     private String onTrace;
+
+    @ApiModelProperty( value = "负责人" )
+    private String charge;
+
+    @ApiModelProperty( value = "系列" )
+    private String series;
+
+    @ApiModelProperty( value = "事业部" )
+    private String division;
 
     @ApiModelProperty( value ="旧料号" )
     private String oldItemCode;
@@ -50,12 +60,39 @@ public class T_MANUAL_NEWS_EC_LIST_STATEDTO implements Serializable {
         this.oldItemCode = oldItemCode;
     }
 
+    public String getCharge() {
+        return charge;
+    }
+
+    public void setCharge(String charge) {
+        this.charge = charge;
+    }
+
+    public String getSeries() {
+        return series;
+    }
+
+    public void setSeries(String series) {
+        this.series = series;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
+    }
+
     @Override
     public String toString() {
         return "T_MANUAL_NEWS_EC_LIST_STATEDTO{" +
                 "itemCode='" + itemCode + '\'' +
                 ", itemName='" + itemName + '\'' +
                 ", onTrace='" + onTrace + '\'' +
+                ", charge='" + charge + '\'' +
+                ", series='" + series + '\'' +
+                ", division='" + division + '\'' +
                 ", oldItemCode='" + oldItemCode + '\'' +
                 '}';
     }

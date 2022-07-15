@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -74,7 +75,7 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
             //Map<String, String> telephoneAndName = new HashMap<>();
             //Map<String, String> jobNumber = new HashMap<>();
             int errorCount = 0;
-            List<NewItem> list = new ArrayList<>();
+            List<T_MANUAL_NEWS_EC_LIST_STATE> list = new ArrayList<>();
             for (int i = 1; i < totalRows; i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) {
@@ -100,7 +101,7 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
                     }
                     index++;
                 }
-                NewItem t = mapToBean(entity);
+                T_MANUAL_NEWS_EC_LIST_STATE t = mapToBean(entity);
                 list.add(t);
                 //错误信息记录
                 //String s = JSONObject.fromObject(result).toString()
@@ -119,46 +120,62 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
             throw new RuntimeException(e);
         }
     }
-
-    public void tmpToEntity(List<NewItem> list) {
-        Map<String,String> map = new HashMap<>();
+    public void tmpToEntity(List<T_MANUAL_NEWS_EC_LIST_STATE> list) {
         try {
-            List<T_MANUAL_NEWS_EC_LIST_STATE> list_states = new ArrayList<>();
-            list.forEach(e ->{
-                T_MANUAL_NEWS_EC_LIST_STATE t = new T_MANUAL_NEWS_EC_LIST_STATE();
-                t.setItemCode(e.getItemCode());
-                t.setItemName(e.getItemName());
-                if(StringUtils.isNotBlank(e.getItemCode())
-                        &&StringUtils.isNotBlank(e.getOldItemCode())
-                        &&e.getItemCode()!=e.getOldItemCode()) {
-                    log.info("删除旧数据并新增"+e.toString());
-                    map.put(e.getOldItemCode(),e.getItemCode());
-                    t_MANUAL_NEWS_EC_LIST_STATERepository.deleteById(e.getOldItemCode());
-                    t.setOnTrace("是");
-                } else if(StringUtils.isNotBlank(e.getItemCode())
-                        &&StringUtils.isNotBlank(e.getOldItemCode())
-                        &&e.getItemCode()==e.getOldItemCode()) {
-                    log.info("修改数据"+e.toString());
-                    T_MANUAL_NEWS_EC_LIST_STATE z = t_MANUAL_NEWS_EC_LIST_STATERepository.findById(e.itemCode).get();
-                    t.setOnTrace(z.getOnTrace());
-                } else if(StringUtils.isNotBlank(e.getItemCode())
-                        &&StringUtils.isBlank(e.getOldItemCode())) {
-                    log.info("新增数据"+e.toString());
-                    t.setOnTrace("是");
-                }
-                list_states.add(t);
-            });
-            log.info("T_MANUAL_EST_EC同步更新的旧:新料号"+map.toString());
-            map.forEach((k,v)->{
-                List<T_MANUAL_EST_EC> list1 = t_MANUAL_EST_ECRepository.findAllByItemCode(k);
-                list1.forEach(e->e.setItemCode(v));
-                t_MANUAL_EST_ECRepository.saveAll(list1);
-            });
-            t_MANUAL_NEWS_EC_LIST_STATERepository.saveAll(list_states);
+            List<String> l = list.stream().map(T_MANUAL_NEWS_EC_LIST_STATE::getItemCode).collect(Collectors.toList());
+            Integer count = t_MANUAL_NEWS_EC_LIST_STATERepository.countByItemCodeIn(l);
+            if(count>0) {
+                log.error("存在料号相同数据，请先删除。数量："+count);
+                throw new RuntimeException("存在料号相同数据，请先删除。");
+            } else {
+                t_MANUAL_NEWS_EC_LIST_STATERepository.saveAll(list);
+            }
         } catch (Exception e) {
-            throw new RuntimeException("插入数据库报错。");
+            throw new RuntimeException(e.getMessage());
         }
     }
+//    public void tmpToEntity(List<NewItem> list) {
+//        Map<String,String> map = new HashMap<>();
+//        try {
+//            List<T_MANUAL_NEWS_EC_LIST_STATE> list_states = new ArrayList<>();
+//            list.forEach(e ->{
+//                T_MANUAL_NEWS_EC_LIST_STATE t = new T_MANUAL_NEWS_EC_LIST_STATE();
+//                t.setItemCode(e.getItemCode());
+//                t.setItemName(e.getItemName());
+//                t.setCharge(e.getCharge());
+//                t.setSeries(e.getSeries());
+//                t.setDivision(e.getDivision());
+//                if(StringUtils.isNotBlank(e.getItemCode())
+//                        &&StringUtils.isNotBlank(e.getOldItemCode())
+//                        &&e.getItemCode()!=e.getOldItemCode()) {
+//                    log.info("删除旧数据并新增"+e.toString());
+//                    map.put(e.getOldItemCode(),e.getItemCode());
+//                    t_MANUAL_NEWS_EC_LIST_STATERepository.deleteById(e.getOldItemCode());
+//                    t.setOnTrace("是");
+//                } else if(StringUtils.isNotBlank(e.getItemCode())
+//                        &&StringUtils.isNotBlank(e.getOldItemCode())
+//                        &&e.getItemCode()==e.getOldItemCode()) {
+//                    log.info("修改数据"+e.toString());
+//                    T_MANUAL_NEWS_EC_LIST_STATE z = t_MANUAL_NEWS_EC_LIST_STATERepository.findById(e.itemCode).get();
+//                    t.setOnTrace(z.getOnTrace());
+//                } else if(StringUtils.isNotBlank(e.getItemCode())
+//                        &&StringUtils.isBlank(e.getOldItemCode())) {
+//                    log.info("新增数据"+e.toString());
+//                    t.setOnTrace("是");
+//                }
+//                list_states.add(t);
+//            });
+//            log.info("T_MANUAL_EST_EC同步更新的旧:新料号"+map.toString());
+//            map.forEach((k,v)->{
+//                List<T_MANUAL_EST_EC> list1 = t_MANUAL_EST_ECRepository.findAllByItemCode(k);
+//                list1.forEach(e->e.setItemCode(v));
+//                t_MANUAL_EST_ECRepository.saveAll(list1);
+//            });
+//            t_MANUAL_NEWS_EC_LIST_STATERepository.saveAll(list_states);
+//        } catch (Exception e) {
+//            throw new RuntimeException("插入数据库报错。");
+//        }
+//    }
 
     public byte[] downloadFile(){
         ByteArrayOutputStream outputStream = null;
@@ -241,16 +258,26 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
         return bean;
     }
 
-    public NewItem mapToBean(Map<String, Object> map) throws Exception {
-        NewItem bean = new NewItem();
-        bean.setItemName(map.get("itemName")==null?null:map.get("itemName").toString());
-        bean.setProductName(map.get("productName")==null?null:map.get("productName").toString());
+    public T_MANUAL_NEWS_EC_LIST_STATE mapToBean(Map<String, Object> map) throws Exception {
+        T_MANUAL_NEWS_EC_LIST_STATE bean= new T_MANUAL_NEWS_EC_LIST_STATE();
         bean.setItemCode(map.get("itemCode")==null?null:map.get("itemCode").toString());
-        bean.setOldItemName(map.get("oldItemName")==null?null:map.get("oldItemName").toString());
-        bean.setOldProductName(map.get("oldProductName")==null?null:map.get("oldProductName").toString());
-        bean.setOldItemCode(map.get("oldItemCode")==null?null:map.get("oldItemCode").toString());
+        bean.setItemName(map.get("itemName")==null?null:map.get("itemName").toString());
+        bean.setOnTrace(map.get("onTrace")==null?null:map.get("onTrace").toString());
+        bean.setCharge(map.get("charge")==null?null:map.get("charge").toString());
+        bean.setSeries(map.get("series")==null?null:map.get("series").toString());
+        bean.setDivision(map.get("division")==null?null:map.get("division").toString());
         return bean;
     }
+//    public NewItem mapToBean(Map<String, Object> map) throws Exception {
+//        NewItem bean = new NewItem();
+//        bean.setItemName(map.get("itemName")==null?null:map.get("itemName").toString());
+//        bean.setProductName(map.get("productName")==null?null:map.get("productName").toString());
+//        bean.setItemCode(map.get("itemCode")==null?null:map.get("itemCode").toString());
+//        bean.setOldItemName(map.get("oldItemName")==null?null:map.get("oldItemName").toString());
+//        bean.setOldProductName(map.get("oldProductName")==null?null:map.get("oldProductName").toString());
+//        bean.setOldItemCode(map.get("oldItemCode")==null?null:map.get("oldItemCode").toString());
+//        return bean;
+//    }
 
     private LocalDate MapValueToDate(String s){
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/mm/dd");
@@ -346,12 +373,12 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
 
     public Map<String, String> getHeadMap(){
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("itemName", "新料号简称");
-        map.put("productName", "产品中文名称");
         map.put("itemCode", "料号");
-        map.put("oldItemName", "旧料号简称");
-        map.put("oldProductName", "旧中文名称");
-        map.put("oldItemCode", "旧料号");
+        map.put("itemName", "料号简称");
+        map.put("onTrace","是否追踪");
+        map.put("charge","负责人");
+        map.put("series","系列");
+        map.put("division","事业部");
         return map;
     }
 
@@ -457,6 +484,12 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
         private String productName;
         //料号
         private String itemCode;
+        //负责人
+        private String charge;
+        //系列
+        private String series;
+        //事业部
+        private String division;
         //旧料号简称
         private String oldItemName;
         //旧中文名称
@@ -512,12 +545,39 @@ public class T_MANUAL_NEWS_EC_LIST_STATEExcelService {
             this.oldItemCode = oldItemCode;
         }
 
+        public String getCharge() {
+            return charge;
+        }
+
+        public void setCharge(String charge) {
+            this.charge = charge;
+        }
+
+        public String getSeries() {
+            return series;
+        }
+
+        public void setSeries(String series) {
+            this.series = series;
+        }
+
+        public String getDivision() {
+            return division;
+        }
+
+        public void setDivision(String division) {
+            this.division = division;
+        }
+
         @Override
         public String toString() {
             return "NewItem{" +
                     "itemName='" + itemName + '\'' +
                     ", productName='" + productName + '\'' +
                     ", itemCode='" + itemCode + '\'' +
+                    ", charge='" + charge + '\'' +
+                    ", series='" + series + '\'' +
+                    ", division='" + division + '\'' +
                     ", oldItemName='" + oldItemName + '\'' +
                     ", oldProductName='" + oldProductName + '\'' +
                     ", oldItemCode='" + oldItemCode + '\'' +

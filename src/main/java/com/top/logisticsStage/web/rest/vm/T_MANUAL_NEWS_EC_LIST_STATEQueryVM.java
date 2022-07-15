@@ -13,6 +13,15 @@ public class T_MANUAL_NEWS_EC_LIST_STATEQueryVM {
     @ApiModelProperty( value ="是否追踪" )
     private String onTrace;
 
+    @ApiModelProperty( value = "负责人" )
+    private String charge;
+
+    @ApiModelProperty( value = "系列" )
+    private String series;
+
+    @ApiModelProperty( value = "事业部" )
+    private String division;
+
     public String getItemCode() {
         return itemCode;
     }
@@ -35,5 +44,29 @@ public class T_MANUAL_NEWS_EC_LIST_STATEQueryVM {
 
     public void setOnTrace(String onTrace) {
         this.onTrace = onTrace;
+    }
+
+    public String getCharge() {
+        return charge;
+    }
+
+    public void setCharge(String charge) {
+        this.charge = charge;
+    }
+
+    public String getSeries() {
+        return series;
+    }
+
+    public void setSeries(String series) {
+        this.series = series;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
     }
 }

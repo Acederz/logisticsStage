@@ -23,6 +23,15 @@ public class T_MANUAL_NEWS_EC_LIST_STATE implements Serializable {
     @Column( name = "是否追踪" )
     private String onTrace;
 
+    @Column( name = "负责人" )
+    private String charge;
+
+    @Column( name = "系列" )
+    private String series;
+
+    @Column( name = "事业部" )
+    private String division;
+
     public String getItemCode() {
         return itemCode;
     }
@@ -47,12 +56,39 @@ public class T_MANUAL_NEWS_EC_LIST_STATE implements Serializable {
         this.onTrace = onTrace;
     }
 
+    public String getCharge() {
+        return charge;
+    }
+
+    public void setCharge(String charge) {
+        this.charge = charge;
+    }
+
+    public String getSeries() {
+        return series;
+    }
+
+    public void setSeries(String series) {
+        this.series = series;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
+    }
+
     @Override
     public String toString() {
-        return "T_MANUAL_NEWS_EC_LIST_STATEMapper{" +
+        return "T_MANUAL_NEWS_EC_LIST_STATE{" +
                 "itemCode='" + itemCode + '\'' +
                 ", itemName='" + itemName + '\'' +
-                ", onTrace=" + onTrace +
+                ", onTrace='" + onTrace + '\'' +
+                ", charge='" + charge + '\'' +
+                ", series='" + series + '\'' +
+                ", division='" + division + '\'' +
                 '}';
     }
 }

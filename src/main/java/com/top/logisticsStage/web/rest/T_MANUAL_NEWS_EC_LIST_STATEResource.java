@@ -7,6 +7,7 @@ import com.top.logisticsStage.service.dto.T_MANUAL_NEWS_EC_LIST_STATEDTO;
 import com.top.logisticsStage.web.rest.errors.ErrorVM;
 import com.top.logisticsStage.web.rest.util.HeaderUtil;
 import com.top.logisticsStage.web.rest.util.PaginationUtil;
+import com.top.logisticsStage.web.rest.vm.T_MANUAL_EST_ECQueryVM;
 import com.top.logisticsStage.web.rest.vm.T_MANUAL_NEWS_EC_LIST_STATEQueryVM;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -109,6 +110,14 @@ public class T_MANUAL_NEWS_EC_LIST_STATEResource {
         return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getItemCode()))
                 .body(result);
+    }
+
+    @DeleteMapping("/T_MANUAL_NEWS_EC_LIST_STATE/delete")
+    @Timed
+    public ResponseEntity<Void> deleteAnnex(T_MANUAL_NEWS_EC_LIST_STATEQueryVM queryVM) {
+        log.debug("REST request to delete T_MANUAL_NEWS_EC_LIST_STATE : {}", queryVM.toString());
+        Integer flg = t_MANUAL_NEWS_EC_LIST_STATEService.deleteByVm(queryVM);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, "删除"+flg.toString()+"条: "+queryVM.toString())).build();
     }
 
     @GetMapping(value = "/T_MANUAL_NEWS_EC_LIST_STATE/file", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

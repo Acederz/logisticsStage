@@ -5,11 +5,13 @@ import com.top.logisticsStage.domain.T_MANUAL_EST_EC;
 import com.top.logisticsStage.repository.T_MANUAL_EST_ECRepository;
 import com.top.logisticsStage.service.dto.T_MANUAL_EST_ECDTO;
 import com.top.logisticsStage.service.mapper.T_MANUAL_EST_ECMapper;
+import com.top.logisticsStage.service.util.CustomCollectors;
 import com.top.logisticsStage.web.rest.vm.T_MANUAL_EST_ECQueryVM;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,6 +25,7 @@ import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -64,6 +67,17 @@ public class T_MANUAL_EST_ECService {
         Page<T_MANUAL_EST_EC> list = t_MANUAL_EST_ECRepository.findAll(buildMultConditional(queryVM), pageable);
         Page<T_MANUAL_EST_ECDTO> page = list.map(t_MANUAL_EST_ECMapper::toDto);
         return page;
+    }
+
+    public Integer deleteByVm(T_MANUAL_EST_ECQueryVM queryVM) {
+        List<T_MANUAL_EST_EC> list =t_MANUAL_EST_ECRepository.findAll(buildMultConditional(queryVM));
+        List<Long> ids = list.stream().map(T_MANUAL_EST_EC::getId).collect(Collectors.toList());
+        List<List<Long>> numberList = ids.stream().collect(CustomCollectors.groupByNumber(5));
+        Integer flg = 0;
+        for(int i=0;i<numberList.size();i++) {
+            flg +=  t_MANUAL_EST_ECRepository.deleteByIdIn(numberList.get(i));
+        }
+        return flg;
     }
 
     private Specification<T_MANUAL_EST_EC> buildMultConditional(T_MANUAL_EST_ECQueryVM queryVM) {

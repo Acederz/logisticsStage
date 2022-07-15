@@ -18,4 +18,6 @@ public interface T_MANUAL_EST_ECRepository extends JpaRepository<T_MANUAL_EST_EC
     T_MANUAL_EST_EC findAllByItemCodeAndYearAndMonthAndTargetType(String itemCode, BigDecimal year, BigDecimal month, TargetType targetType);
 
     List<T_MANUAL_EST_EC> findAllByItemCode(String itemCode);
+
+    Integer deleteByIdIn(List<Long> ids);
 }

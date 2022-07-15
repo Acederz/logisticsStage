@@ -1,8 +1,10 @@
 package com.top.logisticsStage.service;
 
 import com.top.logisticsStage.domain.T_MANUAL_EST_EC;
+import com.top.logisticsStage.domain.T_MANUAL_NEWS_EC_LIST_STATE;
 import com.top.logisticsStage.domain.enumeration.TargetType;
 import com.top.logisticsStage.repository.T_MANUAL_EST_ECRepository;
+import com.top.logisticsStage.repository.T_MANUAL_NEWS_EC_LIST_STATERepository;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -28,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -37,9 +40,11 @@ public class T_MANUAL_EST_ECExcelService {
 
     private final String EXCELL_NAME = "classpath:templates/T_MANUAL_EST_EC.xlsx";
     private final T_MANUAL_EST_ECRepository t_MANUAL_EST_ECRepository;
+    private final T_MANUAL_NEWS_EC_LIST_STATERepository t_MANUAL_NEWS_EC_LIST_STATERepository;
 
-    public T_MANUAL_EST_ECExcelService(T_MANUAL_EST_ECRepository t_MANUAL_EST_ECRepository) {
+    public T_MANUAL_EST_ECExcelService(T_MANUAL_EST_ECRepository t_MANUAL_EST_ECRepository, T_MANUAL_NEWS_EC_LIST_STATERepository t_MANUAL_NEWS_EC_LIST_STATERepository) {
         this.t_MANUAL_EST_ECRepository = t_MANUAL_EST_ECRepository;
+        this.t_MANUAL_NEWS_EC_LIST_STATERepository = t_MANUAL_NEWS_EC_LIST_STATERepository;
     }
 
     // 样式
@@ -127,16 +132,24 @@ public class T_MANUAL_EST_ECExcelService {
     public void tmpToEntity(List<T_MANUAL_EST_EC> list) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
+            List<String> itemCodes = new ArrayList<>();
             list.forEach(e->{
+                if(!t_MANUAL_NEWS_EC_LIST_STATERepository.existsByItemCode(e.getItemCode())) {
+                    itemCodes.add(e.getItemCode());
+                    throw new RuntimeException("存在未导入的新品，请先导入！");
+                }
                 T_MANUAL_EST_EC t = t_MANUAL_EST_ECRepository.findAllByItemCodeAndYearAndMonthAndTargetType(e.getItemCode(),e.getYear(),e.getMonth(),e.getTargetType());
                 if(t!=null) {
-                    log.info("T_MANUAL_EST_EC导入旧数据："+t.toString()+"新数据："+e.toString());
-                    e.setId(t.getId());
+                    throw new RuntimeException("数据库存在相同条件(料号，年，月，目标类型)数据，请先删除。");
                 }
             });
+            if(itemCodes!=null&&itemCodes.size()>0) {
+                System.out.println(itemCodes.stream().collect(Collectors.toSet()).toString());
+                throw new RuntimeException("存在未导入的新品，请先导入！");
+            }
             t_MANUAL_EST_ECRepository.saveAll(list);
         } catch (Exception e) {
-            throw new RuntimeException("插入数据库报错。");
+            throw new RuntimeException(e);
         }
     }
 

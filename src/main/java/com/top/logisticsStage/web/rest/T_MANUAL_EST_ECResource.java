@@ -111,6 +111,14 @@ public class T_MANUAL_EST_ECResource {
                 .body(result);
     }
 
+    @DeleteMapping("/T_MANUAL_EST_EC/delete")
+    @Timed
+    public ResponseEntity<Void> deleteAnnex(T_MANUAL_EST_ECQueryVM queryVM) {
+        log.debug("REST request to delete T_MANUAL_EST_EC : {}", queryVM.toString());
+        Integer flg = t_MANUAL_EST_ECService.deleteByVm(queryVM);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, "删除"+flg.toString()+"条: "+queryVM.toString())).build();
+    }
+
     @GetMapping(value = "/T_MANUAL_EST_EC/file", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     @Timed
     @ApiOperation(value = "模板下载")
