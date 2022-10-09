@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -62,6 +63,7 @@ public class T_MANUAL_EST_ECResource {
         }
         //TenantContext.set(tenantKey);
         try {
+            log.info(LocalDate.now()+"目标更新导入开始");
             t_MANUAL_EST_ECExcelService.excelImport(workbook);
         } catch (Exception e) {
             return new ResponseEntity(new ErrorVM(e.getMessage()), HttpStatus.BAD_REQUEST);

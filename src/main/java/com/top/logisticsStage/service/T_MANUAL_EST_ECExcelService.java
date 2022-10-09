@@ -100,11 +100,14 @@ public class T_MANUAL_EST_ECExcelService {
                         case "year":
                         case "month":
                         case "itemCode":
-                        case "targetType":
                         case "saleNumber":
                         case "salePrice":
                             cellIsNotNull(key, headMap.get(key), value, entity, result);
                             break;
+                        case "targetType":
+                            if(cellIsNotNull(key, headMap.get(key), value, entity, result)) {
+                                cellIsEnum(key, headMap.get(key), value, entity, result);
+                            }
                         default: entity.put(key, value); break;
                     }
                     index++;
@@ -130,6 +133,7 @@ public class T_MANUAL_EST_ECExcelService {
     }
 
     public void tmpToEntity(List<T_MANUAL_EST_EC> list) {
+        log.info("开始目标更新批量导入");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
             List<String> itemCodes = new ArrayList<>();
@@ -142,6 +146,7 @@ public class T_MANUAL_EST_ECExcelService {
                 if(t!=null) {
                     throw new RuntimeException("数据库存在相同条件(料号，年，月，目标类型)数据，请先删除。");
                 }
+                log.info(e.toString());
             });
             if(itemCodes!=null&&itemCodes.size()>0) {
                 System.out.println(itemCodes.stream().collect(Collectors.toSet()).toString());
@@ -151,6 +156,7 @@ public class T_MANUAL_EST_ECExcelService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        log.info("结束目标更新批量导入");
     }
 
     public byte[] downloadFile(){
@@ -297,9 +303,22 @@ public class T_MANUAL_EST_ECExcelService {
         if (!select.containsKey(cellValue)) {
             log.info(key+"  "+cellName + "的值不符合下拉列表！");
             result.put(key, cellName + "的值不符合下拉列表！");
-            return true;
+            return false;
         }
-        return false;
+        return true;
+    }
+
+    private boolean cellIsEnum(String key, String cellName, String cellValue, Map<String, Object> user, Map<String, String> result){
+        user.put(key, cellValue);
+        if (StringUtils.isNotBlank(cellValue)) {
+            try {
+                TargetType.valueOf(cellValue);
+            } catch (Exception e) {
+                result.put(key, cellName + "的值不符合目标类型！");
+            }
+            return false;
+        }
+        return true;
     }
 
     private void toDate(String key, String cellName, String cellValue, Map<String, Object> user, DateTimeFormatter dateTimeFormatter, Map<String, String> result){

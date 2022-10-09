@@ -53,6 +53,7 @@ public class T_MANUAL_EST_ECService {
     }
 
     public T_MANUAL_EST_ECDTO update(T_MANUAL_EST_ECDTO dto) {
+        log.info("目标导入数据修改");
         log.info(SecurityUtils.getCurrentUserLogin() +"修改原数据："+t_MANUAL_EST_ECRepository.getOne(dto.getId()).toString());
         log.info(SecurityUtils.getCurrentUserLogin() +"修改新数据："+dto.toString());
         T_MANUAL_EST_EC entity = t_MANUAL_EST_ECMapper.toEntity(dto);
@@ -70,6 +71,7 @@ public class T_MANUAL_EST_ECService {
     }
 
     public Integer deleteByVm(T_MANUAL_EST_ECQueryVM queryVM) {
+        log.info("目标导入删除条件："+queryVM.toString());
         List<T_MANUAL_EST_EC> list =t_MANUAL_EST_ECRepository.findAll(buildMultConditional(queryVM));
         List<Long> ids = list.stream().map(T_MANUAL_EST_EC::getId).collect(Collectors.toList());
         List<List<Long>> numberList = ids.stream().collect(CustomCollectors.groupByNumber(5));
@@ -77,6 +79,9 @@ public class T_MANUAL_EST_ECService {
         for(int i=0;i<numberList.size();i++) {
             flg +=  t_MANUAL_EST_ECRepository.deleteByIdIn(numberList.get(i));
         }
+        list.forEach(e-> {
+            log.info("目标更新导入删除数据："+e.toString());
+        });
         return flg;
     }
 

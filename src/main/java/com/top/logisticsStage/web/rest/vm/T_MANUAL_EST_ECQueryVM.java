@@ -51,4 +51,14 @@ public class T_MANUAL_EST_ECQueryVM {
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
     }
+
+    @Override
+    public String toString() {
+        return "T_MANUAL_EST_ECQueryVM{" +
+                "itemCode='" + itemCode + '\'' +
+                ", year=" + year +
+                ", month=" + month +
+                ", targetType=" + targetType +
+                '}';
+    }
 }

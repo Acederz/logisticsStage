@@ -32,7 +32,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@Api(tags = "新品目标")
+@Api(tags = "新品目标清单")
 public class T_MANUAL_NEWS_EC_LIST_STATEResource {
 
     private final Logger log = LoggerFactory.getLogger(T_MANUAL_NEWS_EC_LIST_STATEResource.class);
