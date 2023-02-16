@@ -1,68 +1,50 @@
-package com.top.logisticsStage.domain;
+package com.top.logisticsStage.service.dto;
 
-import com.top.logisticsStage.domain.enumeration.TargetType;
-import com.top.logisticsStage.domain.primarykey.T_MANUAL_FEE_XLS_SJPK;
-import io.swagger.annotations.ApiModel;
-import lombok.Data;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-@ApiModel(description = "新零售费用实际")
-@Data
-@Entity
-@Table( name = "T_MANUAL_FEE_XLS_SJ" )
-//@IdClass(value = T_MANUAL_FEE_XLS_SJPK.class)
-public class T_MANUAL_FEE_XLS_SJ {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column( name = "ID" )
+public class T_MANUAL_FEE_XLS_YSDTO implements Serializable {
+    
+    @ApiModelProperty(value = "ID" )
     private Long id;
 
-    @Column( name = "战区" )
-    private String zone;
-
-    @Column( name = "片区" )
-    private String area;
-
-    @Column( name = "事业部" )
+    @ApiModelProperty(value = "事业部" )
     private String businessDepart;
 
-    @Column( name = "所属期间" )
-    private String period;
+    @ApiModelProperty(value = "战区" )
+    private String zone;
 
-    @Column( name = "预提" )
-    private String withholding;
+    @ApiModelProperty(value = "片区" )
+    private String area;
 
-    @Column( name = "系统_财务" )
+    @ApiModelProperty(value = "系统_财务" )
     private String systemFinance;
 
-    @Column( name = "客户名称_财务" )
+    @ApiModelProperty(value = "客户名称_财务" )
     private String customerFinance;
 
-    @Column( name = "系统" )
+    @ApiModelProperty(value = "系统" )
     private String system;
 
-    @Column( name = "客户名称" )
+    @ApiModelProperty(value = "客户名称" )
     private String customer;
 
-    @Column( name = "统计指标1" )
+    @ApiModelProperty(value = "统计指标1" )
     private String target1;
 
-    @Column( name = "统计指标2" )
+    @ApiModelProperty(value = "统计指标2" )
     private String target2;
 
-    @Column( name = "统计指标3" )
+    @ApiModelProperty(value = "统计指标3" )
     private String target3;
 
-    @Column( name = "年月" )
+    @ApiModelProperty(value = "年月" )
     private String yearMonth;
 
-    @Column( name = "实际", precision = 16, scale = 4 )
-    private BigDecimal actual;
+    @ApiModelProperty(value = "预算" )
+    private BigDecimal budget;
 
     public Long getId() {
         return id;
@@ -70,6 +52,14 @@ public class T_MANUAL_FEE_XLS_SJ {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getBusinessDepart() {
+        return businessDepart;
+    }
+
+    public void setBusinessDepart(String businessDepart) {
+        this.businessDepart = businessDepart;
     }
 
     public String getZone() {
@@ -86,30 +76,6 @@ public class T_MANUAL_FEE_XLS_SJ {
 
     public void setArea(String area) {
         this.area = area;
-    }
-
-    public String getBusinessDepart() {
-        return businessDepart;
-    }
-
-    public void setBusinessDepart(String businessDepart) {
-        this.businessDepart = businessDepart;
-    }
-
-    public String getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(String period) {
-        this.period = period;
-    }
-
-    public String getWithholding() {
-        return withholding;
-    }
-
-    public void setWithholding(String withholding) {
-        this.withholding = withholding;
     }
 
     public String getSystemFinance() {
@@ -176,11 +142,11 @@ public class T_MANUAL_FEE_XLS_SJ {
         this.yearMonth = yearMonth;
     }
 
-    public BigDecimal getActual() {
-        return actual;
+    public BigDecimal getBudget() {
+        return budget;
     }
 
-    public void setActual(BigDecimal actual) {
-        this.actual = actual;
+    public void setBudget(BigDecimal budget) {
+        this.budget = budget;
     }
 }

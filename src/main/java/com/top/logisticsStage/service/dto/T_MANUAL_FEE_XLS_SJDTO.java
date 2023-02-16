@@ -1,67 +1,55 @@
-package com.top.logisticsStage.domain;
+package com.top.logisticsStage.service.dto;
 
-import com.top.logisticsStage.domain.enumeration.TargetType;
-import com.top.logisticsStage.domain.primarykey.T_MANUAL_FEE_XLS_SJPK;
-import io.swagger.annotations.ApiModel;
-import lombok.Data;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-@ApiModel(description = "新零售费用实际")
-@Data
-@Entity
-@Table( name = "T_MANUAL_FEE_XLS_SJ" )
-//@IdClass(value = T_MANUAL_FEE_XLS_SJPK.class)
-public class T_MANUAL_FEE_XLS_SJ {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column( name = "ID" )
+public class T_MANUAL_FEE_XLS_SJDTO implements Serializable {
+    
+    @ApiModelProperty(value = "ID" )
     private Long id;
 
-    @Column( name = "战区" )
+    @ApiModelProperty(value = "战区" )
     private String zone;
 
-    @Column( name = "片区" )
+    @ApiModelProperty(value = "片区" )
     private String area;
 
-    @Column( name = "事业部" )
+    @ApiModelProperty(value = "事业部" )
     private String businessDepart;
 
-    @Column( name = "所属期间" )
+    @ApiModelProperty(value = "所属期间" )
     private String period;
 
-    @Column( name = "预提" )
+    @ApiModelProperty(value = "预提" )
     private String withholding;
 
-    @Column( name = "系统_财务" )
+    @ApiModelProperty(value = "系统_财务" )
     private String systemFinance;
 
-    @Column( name = "客户名称_财务" )
+    @ApiModelProperty(value = "客户名称_财务" )
     private String customerFinance;
 
-    @Column( name = "系统" )
+    @ApiModelProperty(value = "系统" )
     private String system;
 
-    @Column( name = "客户名称" )
+    @ApiModelProperty(value = "客户名称" )
     private String customer;
 
-    @Column( name = "统计指标1" )
+    @ApiModelProperty(value = "统计指标1" )
     private String target1;
 
-    @Column( name = "统计指标2" )
+    @ApiModelProperty(value = "统计指标2" )
     private String target2;
 
-    @Column( name = "统计指标3" )
+    @ApiModelProperty(value = "统计指标3" )
     private String target3;
 
-    @Column( name = "年月" )
+    @ApiModelProperty(value = "年月" )
     private String yearMonth;
 
-    @Column( name = "实际", precision = 16, scale = 4 )
+    @ApiModelProperty(value = "实际" )
     private BigDecimal actual;
 
     public Long getId() {

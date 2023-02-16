@@ -1,7 +1,5 @@
 package com.top.logisticsStage.domain;
 
-import com.top.logisticsStage.domain.enumeration.TargetType;
-import com.top.logisticsStage.domain.primarykey.T_MANUAL_FEE_XLS_SJPK;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
@@ -10,32 +8,25 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@ApiModel(description = "新零售费用实际")
+@ApiModel(description = "新零售费用预算")
 @Data
 @Entity
-@Table( name = "T_MANUAL_FEE_XLS_SJ" )
-//@IdClass(value = T_MANUAL_FEE_XLS_SJPK.class)
-public class T_MANUAL_FEE_XLS_SJ {
+@Table( name = "T_MANUAL_FEE_XLS_YS" )
+public class T_MANUAL_FEE_XLS_YS {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column( name = "ID" )
     private Long id;
 
+    @Column( name = "事业部" )
+    private String businessDepart;
+
     @Column( name = "战区" )
     private String zone;
 
     @Column( name = "片区" )
     private String area;
-
-    @Column( name = "事业部" )
-    private String businessDepart;
-
-    @Column( name = "所属期间" )
-    private String period;
-
-    @Column( name = "预提" )
-    private String withholding;
 
     @Column( name = "系统_财务" )
     private String systemFinance;
@@ -61,8 +52,8 @@ public class T_MANUAL_FEE_XLS_SJ {
     @Column( name = "年月" )
     private String yearMonth;
 
-    @Column( name = "实际", precision = 16, scale = 4 )
-    private BigDecimal actual;
+    @Column( name = "预算", precision = 16, scale = 4)
+    private BigDecimal budget;
 
     public Long getId() {
         return id;
@@ -70,6 +61,14 @@ public class T_MANUAL_FEE_XLS_SJ {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getBusinessDepart() {
+        return businessDepart;
+    }
+
+    public void setBusinessDepart(String businessDepart) {
+        this.businessDepart = businessDepart;
     }
 
     public String getZone() {
@@ -86,30 +85,6 @@ public class T_MANUAL_FEE_XLS_SJ {
 
     public void setArea(String area) {
         this.area = area;
-    }
-
-    public String getBusinessDepart() {
-        return businessDepart;
-    }
-
-    public void setBusinessDepart(String businessDepart) {
-        this.businessDepart = businessDepart;
-    }
-
-    public String getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(String period) {
-        this.period = period;
-    }
-
-    public String getWithholding() {
-        return withholding;
-    }
-
-    public void setWithholding(String withholding) {
-        this.withholding = withholding;
     }
 
     public String getSystemFinance() {
@@ -176,11 +151,11 @@ public class T_MANUAL_FEE_XLS_SJ {
         this.yearMonth = yearMonth;
     }
 
-    public BigDecimal getActual() {
-        return actual;
+    public BigDecimal getBudget() {
+        return budget;
     }
 
-    public void setActual(BigDecimal actual) {
-        this.actual = actual;
+    public void setBudget(BigDecimal budget) {
+        this.budget = budget;
     }
 }

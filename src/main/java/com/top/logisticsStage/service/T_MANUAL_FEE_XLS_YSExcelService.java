@@ -1,10 +1,7 @@
 package com.top.logisticsStage.service;
 
-import com.top.logisticsStage.domain.T_MANUAL_EST_EC;
-import com.top.logisticsStage.domain.T_MANUAL_NEWS_EC_LIST_STATE;
-import com.top.logisticsStage.domain.enumeration.TargetType;
-import com.top.logisticsStage.repository.T_MANUAL_EST_ECRepository;
-import com.top.logisticsStage.repository.T_MANUAL_NEWS_EC_LIST_STATERepository;
+import com.top.logisticsStage.domain.T_MANUAL_FEE_XLS_YS;
+import com.top.logisticsStage.repository.T_MANUAL_FEE_XLS_YSRepository;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -27,24 +24,20 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class T_MANUAL_EST_ECExcelService {
+public class T_MANUAL_FEE_XLS_YSExcelService {
 
-    private final Logger log = LoggerFactory.getLogger(T_MANUAL_EST_ECExcelService.class);
+    private final Logger log = LoggerFactory.getLogger(T_MANUAL_FEE_XLS_YSExcelService.class);
 
-    private final String EXCELL_NAME = "classpath:templates/T_MANUAL_EST_EC.xlsx";
-    private final T_MANUAL_EST_ECRepository t_MANUAL_EST_ECRepository;
-    private final T_MANUAL_NEWS_EC_LIST_STATERepository t_MANUAL_NEWS_EC_LIST_STATERepository;
+    private final String EXCELL_NAME = "classpath:templates/T_MANUAL_FEE_XLS_YS.xlsx";
+    private final T_MANUAL_FEE_XLS_YSRepository t_MANUAL_FEE_XLS_YSRepository;
 
-    public T_MANUAL_EST_ECExcelService(T_MANUAL_EST_ECRepository t_MANUAL_EST_ECRepository, T_MANUAL_NEWS_EC_LIST_STATERepository t_MANUAL_NEWS_EC_LIST_STATERepository) {
-        this.t_MANUAL_EST_ECRepository = t_MANUAL_EST_ECRepository;
-        this.t_MANUAL_NEWS_EC_LIST_STATERepository = t_MANUAL_NEWS_EC_LIST_STATERepository;
+    public T_MANUAL_FEE_XLS_YSExcelService(T_MANUAL_FEE_XLS_YSRepository t_MANUAL_FEE_XLS_YSRepository) {
+        this.t_MANUAL_FEE_XLS_YSRepository = t_MANUAL_FEE_XLS_YSRepository;
     }
 
     // 样式
@@ -79,7 +72,7 @@ public class T_MANUAL_EST_ECExcelService {
             //Map<String, String> telephoneAndName = new HashMap<>();
             //Map<String, String> jobNumber = new HashMap<>();
             int errorCount = 0;
-            List<T_MANUAL_EST_EC> list = new ArrayList<>();
+            List<T_MANUAL_FEE_XLS_YS> list = new ArrayList<>();
             for (int i = 1; i < totalRows; i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) {
@@ -97,22 +90,11 @@ public class T_MANUAL_EST_ECExcelService {
                     String value = getCellValue(row.getCell(index), format);
                     value = StringUtils.isBlank(value)?null:value;
                     switch (key) {
-                        case "year":
-                        case "month":
-                        case "itemCode":
-                        case "saleNumber":
-                        case "salePrice":
-                            cellIsNotNull(key, headMap.get(key), value, entity, result);
-                            break;
-                        case "targetType":
-                            if(cellIsNotNull(key, headMap.get(key), value, entity, result)) {
-                                cellIsEnum(key, headMap.get(key), value, entity, result);
-                            }
                         default: entity.put(key, value); break;
                     }
                     index++;
                 }
-                T_MANUAL_EST_EC t = mapToBean(entity);
+                T_MANUAL_FEE_XLS_YS t = mapToBean(entity);
                 list.add(t);
                 //错误信息记录
                 //String s = JSONObject.fromObject(result).toString()
@@ -132,32 +114,13 @@ public class T_MANUAL_EST_ECExcelService {
         }
     }
 
-    public void tmpToEntity(List<T_MANUAL_EST_EC> list) {
-        log.info("开始目标更新批量导入");
+    public void tmpToEntity(List<T_MANUAL_FEE_XLS_YS> list) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
-            List<String> itemCodes = new ArrayList<>();
-            list.forEach(e->{
-                if(!t_MANUAL_NEWS_EC_LIST_STATERepository.existsByItemCode(e.getItemCode())) {
-                    itemCodes.add(e.getItemCode());
-                    //throw new RuntimeException("存在未导入的新品，请先导入！");
-                }
-                T_MANUAL_EST_EC t = t_MANUAL_EST_ECRepository.findAllByItemCodeAndYearAndMonthAndTargetType(e.getItemCode(),e.getYear(),e.getMonth(),e.getTargetType());
-                if(t!=null) {
-                    throw new RuntimeException("数据库存在相同条件(料号，年，月，目标类型)数据，请先删除。");
-                }
-                log.info(e.toString());
-            });
-            if(itemCodes!=null&&itemCodes.size()>0) {
-                System.out.println(itemCodes.stream().collect(Collectors.toSet()).toString());
-                log.info("存在未导入的新品:"+itemCodes.stream().collect(Collectors.toSet()).toString());
-                throw new RuntimeException("存在未导入的新品，请先导入！");
-            }
-            t_MANUAL_EST_ECRepository.saveAll(list);
+            t_MANUAL_FEE_XLS_YSRepository.saveAll(list);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("插入数据库报错。");
         }
-        log.info("结束目标更新批量导入");
     }
 
     public byte[] downloadFile(){
@@ -191,7 +154,7 @@ public class T_MANUAL_EST_ECExcelService {
             Row headRow = sheet.getRow(0);
             Map<String, String> headMap = getHeadMap();
             setDataCellStyles(workbook, sheet);
-            List<T_MANUAL_EST_EC> list = t_MANUAL_EST_ECRepository.findAll();
+            List<T_MANUAL_FEE_XLS_YS> list = t_MANUAL_FEE_XLS_YSRepository.findAll();
             // 创建绘图对象
             Drawing p = sheet.createDrawingPatriarch();
             for (int i = 0; i < list.size(); i++) {
@@ -241,15 +204,20 @@ public class T_MANUAL_EST_ECExcelService {
         return bean;
     }
 
-    public T_MANUAL_EST_EC mapToBean(Map<String, Object> map) throws Exception {
-        T_MANUAL_EST_EC bean = new T_MANUAL_EST_EC();
-        bean.setItemCode(map.get("itemCode")==null?null:map.get("itemCode").toString());
-        bean.setYear(map.get("year")==null?null:new BigDecimal(map.get("year").toString()));
-        bean.setMonth(map.get("month")==null?null:new BigDecimal(map.get("month").toString()));;
-        bean.setTargetType(map.get("targetType")==null?null: TargetType.valueOf(map.get("targetType").toString()));
-        bean.setSaleAmount(map.get("saleAmount")==null?null:new BigDecimal(map.get("saleAmount").toString()).setScale(2, RoundingMode.HALF_DOWN));
-        bean.setSalePrice(map.get("salePrice")==null?null:new BigDecimal(map.get("salePrice").toString()).setScale(2, RoundingMode.HALF_DOWN));
-        bean.setSaleNumber(map.get("saleNumber")==null?null:new BigDecimal(map.get("saleNumber").toString()).setScale(2, RoundingMode.HALF_DOWN));
+    public T_MANUAL_FEE_XLS_YS mapToBean(Map<String, Object> map) throws Exception {
+        T_MANUAL_FEE_XLS_YS bean = new T_MANUAL_FEE_XLS_YS();
+        bean.setBusinessDepart(map.get("businessDepart")==null?null:map.get("businessDepart").toString());
+        bean.setZone(map.get("zone")==null?null:map.get("zone").toString());
+        bean.setArea(map.get("area")==null?null:map.get("area").toString());
+        bean.setSystemFinance(map.get("systemFinance")==null?null:map.get("systemFinance").toString());
+        bean.setCustomerFinance(map.get("customerFinance")==null?null:map.get("customerFinance").toString());
+        bean.setSystem(map.get("system")==null?null:map.get("system").toString());
+        bean.setCustomer(map.get("customer")==null?null:map.get("customer").toString());
+        bean.setTarget1(map.get("target1")==null?null:map.get("target1").toString());
+        bean.setTarget2(map.get("target2")==null?null:map.get("target2").toString());
+        bean.setTarget3(map.get("target3")==null?null:map.get("target3").toString());
+        bean.setYearMonth(map.get("yearMonth")==null?null:map.get("yearMonth").toString());
+        bean.setBudget(map.get("budget")==null?null:new BigDecimal(map.get("budget").toString()).setScale(2, RoundingMode.HALF_UP));
         return bean;
     }
 
@@ -304,22 +272,9 @@ public class T_MANUAL_EST_ECExcelService {
         if (!select.containsKey(cellValue)) {
             log.info(key+"  "+cellName + "的值不符合下拉列表！");
             result.put(key, cellName + "的值不符合下拉列表！");
-            return false;
+            return true;
         }
-        return true;
-    }
-
-    private boolean cellIsEnum(String key, String cellName, String cellValue, Map<String, Object> user, Map<String, String> result){
-        user.put(key, cellValue);
-        if (StringUtils.isNotBlank(cellValue)) {
-            try {
-                TargetType.valueOf(cellValue);
-            } catch (Exception e) {
-                result.put(key, cellName + "的值不符合目标类型！");
-            }
-            return false;
-        }
-        return true;
+        return false;
     }
 
     private void toDate(String key, String cellName, String cellValue, Map<String, Object> user, DateTimeFormatter dateTimeFormatter, Map<String, String> result){
@@ -328,8 +283,8 @@ public class T_MANUAL_EST_ECExcelService {
             try {
                 LocalDate date = LocalDate.parse(cellValue, dateTimeFormatter);
             } catch (Exception e) {
-                log.info(key+"  "+cellName + "不是规范日期格式，请格式化日期(yyyy-MM-dd)！");
-                result.put(key, cellName + "不是规范日期格式，请格式化日期(yyyy-MM-dd)！");
+                log.info(key+"  "+cellName + "不是规范日期格式，请格式化日期(yyyy-mm-dd)！");
+                result.put(key, cellName + "不是规范日期格式，请格式化日期(yyyy-mm-dd)！");
             }
 
         } else {
@@ -360,13 +315,18 @@ public class T_MANUAL_EST_ECExcelService {
 
     public Map<String, String> getHeadMap(){
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("itemCode", "料号");
-        map.put("year", "年");
-        map.put("month", "月");
-        map.put("targetType", "目标类型");
-        map.put("saleNumber", "目标零支销量");
-        map.put("salePrice", "目标零支销售单价");
-        map.put("saleAmount", "目标财务毛利额");
+        map.put("businessDepart", "事业部");
+        map.put("zone", "战区");
+        map.put("area", "片区");
+        map.put("systemFinance", "系统_财务");
+        map.put("customerFinance", "客户名称_财务");
+        map.put("system", "系统");
+        map.put("customer", "客户名称");
+        map.put("target1", "统计指标1");
+        map.put("target2", "统计指标2");
+        map.put("target3", "统计指标3");
+        map.put("yearMonth", "年月");
+        map.put("budget", "预算");
         return map;
     }
 
